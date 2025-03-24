@@ -17,9 +17,9 @@ const useFetchDataPagination = (fetchCallback, deps = []) => {
         pagination.current
       );
       if (result) {
-        setData(result.data || []);
+        
+        setData(result.data || result || []);
 
-        // Kiểm tra và cập nhật pagination
         if (result.pagination) {
           setPagination((prev) => ({
             total: result.pagination.TotalCount || prev.total,

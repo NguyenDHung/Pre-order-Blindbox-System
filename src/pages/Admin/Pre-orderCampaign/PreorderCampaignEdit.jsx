@@ -142,7 +142,7 @@ function PreorderCampaignEdit() {
       detailPre_orderCampaign.preorderCampaignId,
       data
     );
-    navigate("/admin/pre-ordercampaign");
+    navigate("/admin/preordercampaign");
   };
 
   return (

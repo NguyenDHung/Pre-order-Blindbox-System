@@ -107,7 +107,7 @@ function PreorderCampaignCreate() {
     var result = await CreatePreorderCampaign(data);
     if(result){
 
-      navigate("/admin/pre-ordercampaign");
+      navigate("/admin/preordercampaign");
     }
   };
 
