@@ -86,12 +86,12 @@ function BulkOrder() {
 
                      </div>
                      {/* Nút trái */}
-                     <div ref={navigationLeftRef} className='z-40 bg-none w-auto h-auto left-[-35px] right-auto absolute top-[50%] mt-[-22px] cursor-pointer leading-[1.6]'>
+                     <div ref={navigationLeftRef} className='z-50 bg-none w-auto h-auto left-[-35px] right-auto absolute top-[50%] mt-[-22px] cursor-pointer leading-[1.6]'>
                         <img className='max-w-full h-auto align-middle '
                            src={LeftButton} alt="Nút bên trái" />
                      </div>
                      {/* Nút phải */}
-                     <div ref={navigationRighttRef} className='z-40 bg-none w-auto h-auto right-[-35px] left-auto absolute top-[50%] mt-[-22px] cursor-pointer leading-[1.6]'>
+                     <div ref={navigationRighttRef} className='z-50 bg-none w-auto h-auto right-[-35px] left-auto absolute top-[50%] mt-[-22px] cursor-pointer leading-[1.6]'>
                         <img className='max-w-full h-auto align-middle '
                            src={RightButton} alt="Nút bên phải" />
                      </div>

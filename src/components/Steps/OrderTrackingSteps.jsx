@@ -11,6 +11,7 @@ import {
   SyncOutlined,
   CarOutlined,
   CheckCircleFilled,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 
 const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
