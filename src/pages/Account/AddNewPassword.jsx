@@ -67,6 +67,10 @@ function AddNewPassword() {
                               {
                                  required: true,
                                  message: 'Vui lòng nhập mật khẩu mới!',
+                              },
+                              {
+                                 min: 6,
+                                 message: 'Tối thiểu phải 6 kí tự'
                               }
                            ]}
                         >
