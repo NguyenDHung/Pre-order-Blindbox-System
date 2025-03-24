@@ -1,0 +1,55 @@
+#stepContainer .ant-steps.formatStepsProgressDot .ant-steps-item-title {
+    position: static !important;
+}
+
+#stepContainer .ant-steps.formatStepsProgressDot .ant-steps-item-title .ant-progress-outer {
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-24px) translateY(-1px);
+    height: 14px;
+}
+
+#stepContainer .ant-steps.formatStepsProgressDot .ant-steps-item-title .ant-progress-outer:hover {
+    box-shadow: 0 0 12px #333;
+}
+
+#stepContainer .ant-steps.formatStepsProgressDot .Active .ant-steps-item-container .ant-steps-item-tail {
+    display: none;
+}
+
+#stepContainer .ant-steps.formatStepsProgressDot .ant-steps-item-title .ant-progress-outer .ant-progress-text {
+    position: absolute;
+    bottom: 20px;
+}
+
+
+#stepContainer .ant-progress .ant-progress-inner {
+    width: 94%;
+}
+
+#stepContainer .ant-progress-bg {
+    height: 14px !important;
+}
+
+#stepContainer .formatStepsProgressDot .ant-steps-item-finish .ant-steps-icon-dot {
+    height: 20px;
+    width: 20px;
+    transform: translateY(-5px);
+}
+
+
+#stepContainer .ant-steps-dot .ant-steps-item-tail::after,
+#stepContainer .ant-steps-dot.ant-steps-small .ant-steps-item-tail::after {
+    height: 10px;
+    transform: translateY(-3px) translateX(-8px);
+}
+
+
+#stepContainer .ant-steps-dot .ant-steps-item-process .ant-steps-item-icon,
+#stepContainer .ant-steps-dot.ant-steps-small .ant-steps-item-process .ant-steps-item-icon,
+#stepContainer .ant-steps .ant-steps-item-wait .ant-steps-item-icon > .ant-steps-icon .ant-steps-icon-dot {
+    top: -6px;
+    left: -12px;
+    width: 20px;
+    height: 20px;
+}
