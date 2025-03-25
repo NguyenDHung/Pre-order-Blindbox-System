@@ -33,10 +33,11 @@ function PreorderCampaignEdit() {
   const [loadMainProduct, setLoadMainProduct] = useState(null);
   const [isUpdated, setIsUpdated] = useState(false);
   const [typeOfCampaign, setTypeOfCampaign] = useState(null);
-  const [isFormValid, setIsFormValid] = useState(true);
+  const [isFormValid, setIsFormValid] = useState(false);
   const [detailPre_orderCampaign, setDetailPre_orderCampaign] = useState({});
   const [isValidMilestones, setIsValidMilestones] = useState(true);
   const [errorMessageForSelectTime, setErrorMessageForSelectTime] = useState(null);
+  const [dateRange, setDateRange] = useState([]);
   const [isAllowed, setIsAllowed] = useState(false);
   const navigate = useNavigate();
 
@@ -45,15 +46,15 @@ function PreorderCampaignEdit() {
       const data = await GetActivePreorderCampaignBySlug(slug);
       setLoadMainProduct(data.blindBox);
       setDetailPre_orderCampaign(data);
+      const start = data.startDate ? dayjs(data.startDate, "YYYY-MM-DD HH:mm") : null;
+      const end = data.endDate ? dayjs(data.endDate, "YYYY-MM-DD HH:mm") : null;
+      setDateRange([start, end]);
       form.setFieldsValue({
         type: data.type === "TimedPricing" ? 0 : 1,
-        dateRange: [
-          data.startDate ? dayjs(data.startDate, "YYYY-MM-DD HH:mm") : null,
-          data.endDate ? dayjs(data.endDate, "YYYY-MM-DD HH:mm") : null,
-        ],
+        dateRange: [start, end],
         milestones: data.preorderMilestones,
       });
-      await onFieldsChange();
+      onFieldsChange();
       setTypeOfCampaign(data.type);
       setLoading(false);
     } catch (error) {
@@ -63,72 +64,63 @@ function PreorderCampaignEdit() {
 
   useEffect(() => {
     fetchCampaign_BySlug();
-    if (detailPre_orderCampaign.status == "Pending") {
-      setIsAllowed(true);
+    if (detailPre_orderCampaign.status !== "Pending") {
+      setIsAllowed(false);
     }
   }, [slug]);
 
-  useEffect(() => {
-    console.log("isFormValid:", isFormValid);
-    console.log("isUpdated:", isUpdated);
-    console.log("isValidMilestones:", isValidMilestones);
-    console.log("isAllowed:", isAllowed);
-  }, [isFormValid, isUpdated, isValidMilestones, isAllowed]);
+  const handleDateChange = (dates) => {
+    setDateRange(dates);
+    form.setFieldsValue({ dateRange: dates });
+    onFieldsChange();
+  };
 
-  const onFieldsChange = async () => {
+  const onFieldsChange = () => {
     const fieldsError = form.getFieldsError();
+    let valid = true;
+
+    if (typeOfCampaign == null || !loadMainProduct) {
+      valid = false;
+    }
+
     const milestoneValues = form.getFieldValue("milestones") || [];
     if (milestoneValues.length <= 2) {
-      setIsFormValid(false);
-      console.log("Validation: Số cột mốc phải lớn hơn 2");
-      return;
+      valid = false;
     }
-    const milestoneHasEmpty = milestoneValues.some((m) => {
-      return (
-        !m ||
-        m.quantity === undefined ||
-        m.quantity === "" ||
-        m.price === undefined ||
-        m.price === "" ||
-        m.price >= loadMainProduct?.listedPrice
-      );
-    });
+    const milestoneHasEmpty = milestoneValues.some(
+      (m) => !m || !m.quantity || !m.price
+    );
     if (milestoneHasEmpty) {
-      setIsFormValid(false);
-      console.log("Validation: Có cột mốc bị thiếu thông tin hoặc giá vượt quá giá niêm yết");
-      return;
+      console.log("Empty milestone fields");
+      valid = false;
     }
 
-    // Validate khoảng thời gian
-    const dateRange = form.getFieldValue("dateRange") || null;
-    const dateNow = new Date();
-    if (dateRange == null) {
-      setIsFormValid(false);
-      setErrorMessageForSelectTime("Ngày bắt đầu và kết thúc không được chừa trống !");
-      return;
+    const currentDate = dayjs();
+    const currentDateRange = form.getFieldValue("dateRange");
+    if (currentDateRange && currentDateRange.length === 2) {
+      const [startDate, endDate] = currentDateRange.map((d) => dayjs(d));
+      if (startDate.isSameOrBefore(currentDate)) {
+        valid = false;
+        setErrorMessageForSelectTime("Ngày bắt đầu bắt buộc phải bắt đầu trong tương lai");
+      } else if (endDate.isBefore(startDate.add(5, "day"))) {
+        valid = false;
+        setErrorMessageForSelectTime("Thời gian hoạt động của chiến dịch không được ít hơn 5 ngày!");
+      } else {
+        setErrorMessageForSelectTime(null);
+      }
+    } else {
+      valid = false;
     }
-    // Sử dụng dayjs để so sánh
-    if (dayjs(dateRange[0]).isSameOrBefore(dayjs(dateNow))) {
-      setErrorMessageForSelectTime("Ngày bắt đầu bắt buộc phải bắt đầu trong tương lai");
-      setIsFormValid(false);
-      return;
-    }
-    if (dayjs(dateRange[1]).isBefore(dayjs(dateRange[0]).add(5, "day"))) {
-      setErrorMessageForSelectTime("Thời gian hoạt động của chiến dịch không được ít hơn 5 ngày !");
-      setIsFormValid(false);
-      return;
-    }
-    setErrorMessageForSelectTime(null);
 
-    // Kiểm tra lỗi của các trường Form khác
     const hasErrors = fieldsError.some((field) => field.errors.length > 0);
-    setIsFormValid(!hasErrors);
+    valid = valid && !hasErrors;
+
+    setIsFormValid(valid);
     setIsUpdated(true);
   };
 
   const handleChangeTypeCampaign = (value) => {
     setTypeOfCampaign(value);
-    // Xóa đi các giá trị cũ của milestones khi thay đổi loại chiến dịch
     form.setFieldsValue({ type: value, milestones: [] });
   };
 
@@ -144,10 +136,7 @@ function PreorderCampaignEdit() {
       })),
     };
 
-    await UpdatePreorderCampaign(
-      detailPre_orderCampaign.preorderCampaignId,
-      data
-    );
+    await UpdatePreorderCampaign(detailPre_orderCampaign.preorderCampaignId, data);
     navigate("/admin/preordercampaign");
   };
 
@@ -286,9 +275,11 @@ function PreorderCampaignEdit() {
                   <RangePicker
                     showTime={{ format: "HH:mm" }}
                     format="YYYY-MM-DD HH:mm"
-                    placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                    placeholder={['Ngày bắt đầu', 'Ngày kết thúc']}
+                    value={dateRange}
+                    onChange={handleDateChange}
                   />
-                  {errorMessageForSelectTime && (
+                  {errorMessageForSelectTime != null && (
                     <p className="text-red-600">{errorMessageForSelectTime}</p>
                   )}
                 </Form.Item>
@@ -298,7 +289,7 @@ function PreorderCampaignEdit() {
                     type="primary"
                     htmlType="submit"
                     loading={loading}
-                    disabled={!isFormValid || !isUpdated || !isValidMilestones || !isAllowed}
+                    disabled={!isFormValid || !isValidMilestones}
                     className="w-full"
                   >
                     Cập nhật

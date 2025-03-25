@@ -7,7 +7,7 @@ import ApproveOrderTable from "../../../components/Orders/ApproveOrderTable";
 function MyOrders() {
   return (
     <div>
-      <div className="max-w-screen-xl w-full mx-auto h-[90vh]">
+      <div className="max-w-screen-xl w-full mx-auto h-full min-h-screen">
         <h1 className="text-center text-2xl py-2">Đơn hàng của tôi</h1>
         <Breadcrumb
           items={[

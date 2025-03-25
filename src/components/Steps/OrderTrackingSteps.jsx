@@ -2,10 +2,6 @@ import React from "react";
 import { Card, Steps } from "antd";
 
 const { Step } = Steps;
-
-// Giả sử bạn có trạng thái của đơn hàng dưới dạng chuỗi hoặc số,
-// ở đây chúng ta sẽ ánh xạ trạng thái thành chỉ số của bước hiện tại.
-// placed, proccessing, delivering, delivered, Cancel
 import {
   FileSearchOutlined,
   SyncOutlined,
@@ -15,7 +11,6 @@ import {
 } from "@ant-design/icons";
 
 const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
-  // Xác định bước hiện tại dựa trên trạng thái đơn hàng
   if (TypeOfOrder === "Confirmed") {
     const statusToStepIndex = {
       Placed: 0,
@@ -31,7 +26,7 @@ const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
           description="Đơn hàng đã được xác nhận"
           icon={
             <FileSearchOutlined
-              style={currentStep == 0 ? { color: "#1890ff" } : null}
+              style={currentStep === 0 ? { color: "#1890ff" } : null}
             />
           }
         />
@@ -40,7 +35,7 @@ const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
           description="Đơn hàng đang được xử lý"
           icon={
             <SyncOutlined
-              style={currentStep == 1 ? { color: "#faad14" } : null}
+              style={currentStep === 1 ? { color: "#faad14" } : null}
             />
           }
         />
@@ -49,7 +44,7 @@ const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
           description="Đơn hàng đang được giao"
           icon={
             <CarOutlined
-              style={currentStep == 2 ? { color: "#13c2c2" } : null}
+              style={currentStep === 2 ? { color: "#13c2c2" } : null}
             />
           }
         />
@@ -58,68 +53,72 @@ const OrderTrackingSteps = ({ status, TypeOfOrder = "Confirmed" }) => {
           description="Đơn hàng đã được giao"
           icon={
             <CheckCircleFilled
-              style={currentStep == 3 ? { color: "#52c41a" } : null}
+              style={currentStep === 3 ? { color: "#52c41a" } : null}
             />
           }
         />
       </Steps>
     );
   } else {
-    const statusToStepIndex = {
-      Waiting: 0,
-      Approve: 1,
-      Reject: 2,
-    };
-    const currentStep = statusToStepIndex[status] || 0;
-    return (
-      <Card title="Tình trạng của đơn hàng" style={{ marginTop: 24 }}>
-        <Steps current={currentStep}>
-          <Step
-            title="Kiểm duyệt đơn hàng"
-            description={
-              currentStep === 0
-                ? "Đơn hàng đang chờ được xác nhận"
-                : "Đơn hàng đã được xác nhận"
-            }
-            icon={
-              <FileSearchOutlined
-                style={{
-                  color:
-                    currentStep === 0
-                      ? "#1890ff"
-                      : currentStep > 0
-                      ? "#52c41a"
-                      : "#d9d9d9",
-                }}
-              />
-            }
-          />
-          <Step
-            title="Thành Công"
-            description="Đơn hàng đã được duyệt"
-            icon={
-              <CheckCircleFilled
-                style={{
-                  color:
-                    currentStep === 1
-                      ? "#1890ff"
-                      : currentStep > 1
-                      ? "#52c41a"
-                      : "#d9d9d9",
-                }}
-              />
-            }
-          />
-          {currentStep === 2 && (
+    // Trường hợp khác, ví dụ như đơn hàng chưa Confirm, có thể là Waiting, Approve hay Reject.
+    if (status === "Reject") {
+      // Nếu đơn hàng bị từ chối, chỉ hiển thị 2 bước: kiểm duyệt và từ chối
+      return (
+        <Card title="Tình trạng của đơn hàng" style={{ marginTop: 24 }}>
+          <Steps current={1}>
+            <Step
+              title="Kiểm duyệt đơn hàng"
+              description="Đơn hàng đã được duyệt"
+              icon={
+                <FileSearchOutlined style={{ color: "#52c41a" }} />
+              }
+            />
             <Step
               title="Đơn hàng bị từ chối"
               description="Đơn của bạn sẽ được hoàn tiền"
-              icon={<CloseCircleOutlined style={{ color: "#f5222d" }} />}
+              icon={
+                <CloseCircleOutlined style={{ color: "#f5222d" }} />
+              }
             />
-          )}
-        </Steps>
-      </Card>
-    );
+          </Steps>
+        </Card>
+      );
+    } else {
+      // Trường hợp còn lại: Waiting hoặc Approve
+      const currentStep = status === "Approve" ? 1 : 0;
+      return (
+        <Card title="Tình trạng của đơn hàng" style={{ marginTop: 24 }}>
+          <Steps current={currentStep}>
+            <Step
+              title="Kiểm duyệt đơn hàng"
+              description={
+                currentStep === 0
+                  ? "Đơn hàng đang chờ được xác nhận"
+                  : "Đơn hàng đã được xác nhận"
+              }
+              icon={
+                <FileSearchOutlined
+                  style={{
+                    color: currentStep === 0 ? "#1890ff" : "#52c41a",
+                  }}
+                />
+              }
+            />
+            <Step
+              title="Thành Công"
+              description="Đơn hàng đã được duyệt"
+              icon={
+                <CheckCircleFilled
+                  style={{
+                    color: currentStep === 1 ? "#1890ff" : "#d9d9d9",
+                  }}
+                />
+              }
+            />
+          </Steps>
+        </Card>
+      );
+    }
   }
 };
 

@@ -57,6 +57,8 @@ function ViewPendingOrderDetail() {
 
   return (
     <div className="max-w-screen-xl w-full mx-auto min-h-screen">
+      <div className="mt-4">
+
       <Breadcrumb
         items={[
           {
@@ -80,6 +82,7 @@ function ViewPendingOrderDetail() {
           },
         ]}
       />
+      </div>
 
       {loading ? (
         <div className="flex justify-center py-10">
